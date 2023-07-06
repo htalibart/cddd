@@ -3,6 +3,7 @@
 import os
 import json
 import tensorflow as tf
+from collections import namedtuple
 DEFAULT_DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), 'data'))
 
 def add_arguments(parser):
@@ -65,9 +66,30 @@ def add_arguments(parser):
     parser.add_argument('--div_loss_scale', default=1.0, type=float)
     parser.add_argument('--div_loss_rate', default=0.9, type=float)
 
+class HParams():
+	def __init__(self, **kwargs):
+		#self.hparams_dict = dict(kwargs)
+		self.__dict__.update(kwargs)
+
+	#def get_hparams(self):
+	#	return namedtuple('GenericDict', self.hparams_dict.keys())(**self.hparams_dict)
+
+	def add_hparam(self, key, value):
+		setattr(self, key, value)
+
+	def set_hparam(self, key, value):
+		setattr(self, key, value)
+
+	def parse_json(self, json_load):
+		json_load_dict = json.loads(json_load)
+		for key, value in json_load_dict.items():
+			self.set_hparam(key, value)
+		return self
+
 def create_hparams(flags):
     """Create training hparams."""
-    hparams = tf.contrib.training.HParams(
+    #hparams = tf.contrib.training.HParams(
+    hparams = HParams(
         model=flags.model,
         input_pipeline=flags.input_pipeline,
         input_sequence_key=flags.input_sequence_key,
